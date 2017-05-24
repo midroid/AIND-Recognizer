@@ -87,7 +87,9 @@ class SelectorBIC(ModelSelector):
                 logN = np.log(len(self.X))
 
                 # caluculating p(number of parameters) in Bayesian information criteria: BIC = -2 * logL + p * logN
-                calculated_bic_score = n ** 2 + 2  (bic_model.n_features) * n - 1
+                # Can you give some more references regarding calculating p 
+                p = n ** 2 + 2 * (bic_model.n_features) * n -1
+                calculated_bic_score = n ** 2 + 2 * p * n - 1
 
                 if calculated_bic_score < best_score_bic:
                     best_score_bic, best_model_bic = calculated_bic_score, bic_model
@@ -109,7 +111,7 @@ class SelectorDIC(ModelSelector):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
         try:
-            best_DIC_score = float("-nf")
+            best_DIC_score = float("-inf")
             best_DIC_model = None
 
             for n in range(self.min_n_components, self.max_n_components + 1):
@@ -139,7 +141,6 @@ class SelectorCV(ModelSelector):
         try:
             best_CV_score = float("inf")
             best_model_CV = None
-            print('ok')
 
             for n in range(self.min_n_components, self.max_n_components+1):
                 CV_scores = []
@@ -148,16 +149,16 @@ class SelectorCV(ModelSelector):
                 for train_idx, text_idx in split_method.split(self.sequences):
                     self.X, self.lengths = combine_sequences(train_idx, self.sequences)
 
-                    X, l = combine_sequences(test_idx, self.sequences)
+                    test_X, test_l = combine_sequences(test_idx, self.sequences)
                     CV_model = self.base_model(n)
 
-                    CV_scores.append(CV_model.score(X, l)) 
-                    
-                    calculated_CV_score = np.mean(CV_scores)
+                    CV_scores.append(CV_model.score(test_X, test_l)) 
                     
                     if calculated_CV_score < best_CV_score:
                         best_CV_score = calculated_CV_score
                         best_model_CV = CV_model
+
+                calculated_CV_score = np.mean(CV_scores)
             
             return best_model_CV
         except:
