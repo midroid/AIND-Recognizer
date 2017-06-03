@@ -139,7 +139,7 @@ class SelectorCV(ModelSelector):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
         try:
-            best_CV_score = float("inf")
+            best_CV_score = float("-inf")
             best_model_CV = None
 
             for n in range(self.min_n_components, self.max_n_components+1):
@@ -154,7 +154,7 @@ class SelectorCV(ModelSelector):
 
                     CV_scores.append(CV_model.score(test_X, test_l)) 
                     
-                    if calculated_CV_score < best_CV_score:
+                    if calculated_CV_score > best_CV_score:
                         best_CV_score = calculated_CV_score
                         best_model_CV = CV_model
 
